@@ -54,9 +54,13 @@ class FreemiumCreditCard
     }
   end
   
-  def self.sample
-    FreemiumCreditCard.new(FreemiumCreditCard.sample_params)
+  def self.sample(opts={})
+    FreemiumCreditCard.new(FreemiumCreditCard.sample_params.merge(opts))
   end
 end
 
 Freemium::FeatureSet.config_file = File.dirname(__FILE__) + '/freemium_feature_sets.yml'
+
+Freemium.gateway = ActiveMerchant::Billing::BogusGateway.new
+#Freemium.gateway = ActiveMerchant::Billing::BraintreeGateway.new(:login => 'demo', :password =>'password')
+#Freemium.gateway = ActiveMerchant::Billing::TrustCommerceGateway.new(:login => 'TestMerchant', :password=>'password')

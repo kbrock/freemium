@@ -13,12 +13,15 @@ module Freemium
     # charges this subscription.
     # assumes, of course, that this module is mixed in to the Subscription model
     def charge!
-      # Save the transaction immediately
-      @transaction = Freemium.gateway.charge(billing_key, self.installment_amount)
-      self.transactions << @transaction
+      #convert active merchant transaction to our own and save immediately
+      response = Freemium.gateway.purchase(self.installment_amount, billing_key)
+      #billing_key ||=response.params['billingid']
+      @transaction = self.transactions.create(self.active_merchant_trans_params(response, :billing_key => billing_key))
+
       self.last_transaction_at = Time.now # TODO this could probably now be inferred from the list of transactions
       self.save(false)
     
+      #TODO: do we want this empty try/catch?
       begin
         if @transaction.success? 
           receive_payment!(@transaction)
@@ -29,6 +32,18 @@ module Freemium
       end
       
       @transaction
+    end
+
+    protected
+    def active_merchant_trans_params(response, other_params={})
+      #For the first charge, if there is no billing id, don't want to erase the new billing id with the previous (nil) value
+      #other_params.delete(:billing_key) if other_params[:billing_key].blank?
+      {
+        :success      =>response.success?,
+        :billing_key  =>response.params['billingid'],
+        :amount_cents =>response.params['paid_amount'].to_f * 100, # subscription
+        :message      =>response.message
+      }.merge(other_params)
     end
 
     module ClassMethods

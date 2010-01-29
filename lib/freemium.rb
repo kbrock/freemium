@@ -13,7 +13,7 @@ module Freemium
     # The gateway of choice. Default gateway is a stubbed testing gateway.
     attr_writer :gateway
     def gateway
-      @gateway ||= Freemium::Gateways::Test.new
+      @gateway ||= ActiveMerchant::Billing::BogusGateway.new
     end
 
     # You need to specify whether Freemium or your gateway's ARB module will control

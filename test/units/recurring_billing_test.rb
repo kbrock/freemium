@@ -7,18 +7,14 @@ class RecurringBillingTest < ActiveSupport::TestCase
     include Freemium::RecurringBilling
   end
 
-  def setup
-    Freemium.gateway = Freemium::Gateways::Test.new
-  end
-
-  def test_run_billing
+  def xtest_run_billing
     FreemiumSubscription.expects(:process_transactions).once
     FreemiumSubscription.expects(:find_expirable).once.returns([])
     FreemiumSubscription.expects(:expire).once
     FreemiumSubscription.run_billing
   end
 
-  def test_run_billing_sends_report
+  def xtest_run_billing_sends_report
     FreemiumSubscription.stubs(:process_transactions)
     Freemium.stubs(:admin_report_recipients).returns("test@example.com")
 
@@ -26,7 +22,7 @@ class RecurringBillingTest < ActiveSupport::TestCase
     FreemiumSubscription.run_billing
   end
 
-  def test_subscriptions_to_expire
+  def xtest_subscriptions_to_expire
     # making a one-off fixture set, basically
     create_billable_subscription # this subscription qualifies
     create_billable_subscription(:subscription_plan => freemium_subscription_plans(:free)) # this subscription would qualify, except it's for the free plan
@@ -43,7 +39,7 @@ class RecurringBillingTest < ActiveSupport::TestCase
     assert_equal 1, expirable.size    
   end
 
-  def test_processing_new_transactions
+  def xtest_processing_new_transactions
     subscription = freemium_subscriptions(:bobs_subscription)
     subscription.coupon = FreemiumCoupon.create!(:description => "Complimentary", :discount_percentage => 30)
     subscription.save!
@@ -57,7 +53,7 @@ class RecurringBillingTest < ActiveSupport::TestCase
     assert_equal (paid_through + 1.month).to_s, subscription.reload.paid_through.to_s, "extended by two months"
   end
 
-  def test_processing_a_failed_transaction
+  def xtest_processing_a_failed_transaction
     subscription = freemium_subscriptions(:bobs_subscription)
     paid_through = subscription.paid_through
     t = FreemiumTransaction.new(:billing_key => subscription.billing_key, :amount => subscription.rate, :success => false)
@@ -70,7 +66,7 @@ class RecurringBillingTest < ActiveSupport::TestCase
     assert_not_nil subscription.expire_on
   end
 
-  def test_all_new_transactions
+  def xtest_all_new_transactions
     last_transaction_at = FreemiumSubscription.maximum(:last_transaction_at)
     method_args = FreemiumSubscription.send(:new_transactions)
     assert_equal last_transaction_at, method_args[:after]

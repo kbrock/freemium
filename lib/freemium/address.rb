@@ -14,5 +14,22 @@ module Freemium
         self.send(setter, value) if self.respond_to? setter
       end
     end
+
+    def params
+      ret={}
+      [:address1, :address2, :city, :state, :zip, :country, :email, :phone_number, :ip_address].each do |name|
+        value=self.send(name)
+        ret[name]=value unless value.blank?
+      end
+      ret
+    end
+
+    def values
+      params.values
+    end
+
+    def keys
+      params.keys
+    end
   end
 end

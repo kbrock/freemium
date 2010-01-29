@@ -5,7 +5,7 @@ bobs_subscription:
   subscription_plan_id: 2
   credit_card_id: 1
   paid_through: <%= (Date.today + 20).to_s :db %>
-  billing_key: tc00001
+  billing_key: 1
   started_on: <%= (Date.today - 60).to_s :db %>
   last_transaction_at: 2007-09-15 12:34:56
 sues_subscription:

@@ -6,24 +6,32 @@ module Freemium
       # recurring billing.
       #
       # should return a Freemium::Response
+
+      #ActiveRecord: delete/unstore(billing_id, options)
       def cancel(billing_key)
         raise MethodNotImplemented
       end
 
       # stores a credit card with the gateway.
       # should return a Freemium::Response
+
+      #ActiveRecord: store (cc, options)
       def store(credit_card, address = nil)
         raise MethodNotImplemented
       end
 
       # updates a credit card in the gateway.
       # should return a Freemium::Response
+
+      #ActiveRecord: update(billing_id, cc, options) - or store
       def update(billing_key, credit_card = nil, address = nil)
         raise MethodNotImplemented
       end
 
       # validates a credit card with the gateway.
       # should return a Freemium::Response
+
+      #NOT IMPLIMENTED? / AUTH?
       def validate(credit_card, address = nil)
         raise MethodNotImplemented
       end
@@ -41,6 +49,7 @@ module Freemium
       #   :before :      - only retrieve transactions before this datetime (non-inclusive)
       #
       # return value should be a collection of Freemium::Transaction objects.
+
       def transactions(options = {})
         raise MethodNotImplemented
       end
@@ -51,6 +60,8 @@ module Freemium
 
       # charges money against the given billing key.
       # should return a Freemium::Transaction
+
+      #ActiveMerchant: purchase
       def charge(billing_key, amount)
         raise MethodNotImplemented
       end

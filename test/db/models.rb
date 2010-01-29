@@ -23,6 +23,7 @@ class FreemiumCoupon < ActiveRecord::Base
 end
 
 class FreemiumTransaction < ActiveRecord::Base
+  belongs_to :subscription, :class_name => 'FreemiumSubscription'
   include Freemium::Transaction
 end
 

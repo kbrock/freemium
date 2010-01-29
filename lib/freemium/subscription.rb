@@ -50,7 +50,8 @@ module Freemium
         validates_presence_of :credit_card, :if => :store_credit_card?
         validates_associated  :credit_card#, :if => :store_credit_card?
 
-        validate :gateway_validates_credit_card
+        #TODO: introduce gateway credit card validation
+        #validate :gateway_validates_credit_card
       end
       base.extend ClassMethods
     end
@@ -67,9 +68,13 @@ module Freemium
 
     def gateway_validates_credit_card
       if credit_card && credit_card.changed? && credit_card.valid?
-        response = Freemium.gateway.validate(credit_card, credit_card.address)
-        unless response.success?
-          errors.add_to_base("Credit card could not be validated: #{response.message}")
+        #TODO: introduce gateway credit card validation
+        # response = Freemium.gateway.validate(credit_card, credit_card.address)
+        # unless response.success?
+        #   errors.add_to_base("Credit card could not be validated: #{response.message}")
+        # end
+        unless credit_card.valid?
+          errors.add_to_base("Credit card could not be validated: #{credit_card.errors.full_messages}")
         end
       end
     end
@@ -120,9 +125,10 @@ module Freemium
     # with an "address" property on the credit card.
     def store_credit_card_offsite
       if credit_card && credit_card.changed? && credit_card.valid?
-        response = billing_key ? Freemium.gateway.update(billing_key, credit_card, credit_card.address) : Freemium.gateway.store(credit_card, credit_card.address)
+        #response = billing_key ? Freemium.gateway.update(billing_key, credit_card, credit_card.address) : Freemium.gateway.store(credit_card, credit_card.address)
+        response = Freemium.gateway.store(credit_card, :address => credit_card.address, :billingid => billing_key)
         raise Freemium::CreditCardStorageError.new(response.message) unless response.success?
-        self.billing_key = response.billing_key
+        self.billing_key = response.params['billingid']
         self.expire_on = nil
         self.credit_card.reload # to prevent needless subsequent store() calls
       end
@@ -141,7 +147,7 @@ module Freemium
 
     def cancel_in_remote_system
       if billing_key
-        Freemium.gateway.cancel(self.billing_key)
+        Freemium.gateway.unstore(self.billing_key)
         self.billing_key = nil
       end
     end
@@ -333,10 +339,10 @@ module Freemium
     end
 
     def credit(amount)
-      self.paid_through = if amount.cents % rate.cents == 0
-        self.paid_through + (amount.cents / rate.cents).months
+      if amount.cents % rate.cents == 0
+        self.paid_through += (amount.cents / rate.cents).months
       else
-        self.paid_through + (amount.cents / daily_rate.cents).days
+        self.paid_through += (amount.cents / daily_rate.cents).days
       end
 
       # if they've paid again, then reset expiration

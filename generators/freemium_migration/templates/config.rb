@@ -4,9 +4,8 @@
 # - setting up production passwords...
 # - better way to do production/test changes?
  
-Freemium.gateway = Freemium::Gateways::BrainTree.new
-Freemium.gateway.username = "demo"
-Freemium.gateway.password = "password"
+Freemium.gateway = ActiveMerchant::Billing::BraintreeGateway.new(:login => 'demo', :password =>'password')
+#Freemium.gateway = ActiveMerchant::Billing::TrustCommerceGateway.new(:login => 'TestMerchant', :password=>'password')
  
 # If you want Freemium to take care of the billing itself
 # (ie, handle everything within your app, with recurring payments via cron
@@ -39,5 +38,5 @@ if RAILS_ENV == 'production'
   Freemium.gateway.password = "password"
 elsif RAILS_ENV == 'test'
   # prevents you from calling BrainTree during your tests
-  Freemium.gateway = Freemium::Gateways::Test.new
+  Freemium.gateway = ActiveMerchant::Billing::BogusGateway.new
 end

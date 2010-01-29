@@ -7,7 +7,7 @@ module Freemium
 
     module ClassMethods
       # the process you should run periodically
-      def run_billing
+      def xrun_billing
         # first, synchronize transactions
         transactions = process_transactions
         
@@ -30,12 +30,12 @@ module Freemium
       # value and only retrieves transactions after that. so be careful that you
       # don't accidentally update the last_transaction_at field for some subset
       # of subscriptions, and leave the others behind!
-      def new_transactions
+      def xnew_transactions
         Freemium.gateway.transactions(:after => self.maximum(:last_transaction_at))
       end
 
       # updates all subscriptions with any new transactions
-      def process_transactions(transactions = new_transactions)
+      def xprocess_transactions(transactions = new_transactions)
         transaction do
           transactions.each do |transaction|
             subscription = FreemiumSubscription.find_by_billing_key(transaction.billing_key)
